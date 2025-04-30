@@ -1,8 +1,10 @@
 # ME5415 AY2024/2025 Project 
 
 # Pipe Robot Locomotion
-After initial environment setup steps, in the ```/proj``` directory
+After initial environment setup steps, in this ```/proj``` directory
 
+        git clone https://github.com/csesarah/ME5415.git
+        cd ME5415
         ./sofa/build/bin/runSofa src/main.py
 
 ---

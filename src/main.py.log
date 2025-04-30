@@ -7,3 +7,7 @@
 
 --- NEW SESSION: 30/04/2025 01:44:14 ---
 /Actuator 1/Cavity2/cavity2.showColor = 1 1 1 1
+
+--- NEW SESSION: 30/04/2025 19:39:53 ---
+/Actuator 1/grf.rayleighStiffness = -0.94
+/Actuator 1/grf.pressure = 4.58

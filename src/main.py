@@ -1,6 +1,8 @@
 import math
 import Sofa.Core
 from Sofa.constants import *
+import gym
+import sofagym.envs
 
 youngModulusActuators = 431
 youngModulusStiffLayerActuators = 1431
@@ -34,6 +36,7 @@ def createScene(rootNode):
     rootNode.addObject('RequiredPlugin', name='Sofa.Component.Topology.Container.Dynamic')  # Needed to use components [TetrahedronSetTopologyContainer]
     rootNode.addObject('RequiredPlugin', name='Sofa.Component.Visual')  # Needed to use components [VisualStyle]  
     rootNode.addObject('RequiredPlugin', name='Sofa.GL.Component.Rendering3D')  # Needed to use components [OglModel,OglSceneFrame]
+    rootNode.addObject('RequiredPlugin', name='Sofa.Component.MechanicalLoad') # Needed to use components [SurfacePressureForceField]
 
     rootNode.addObject('VisualStyle',
                        displayFlags='showVisualModels hideBehaviorModels hideCollisionModels hideBoundingCollisionModels hideForceFields showInteractionForceFields hideWireframe')
@@ -44,7 +47,7 @@ def createScene(rootNode):
     rootNode.addObject('DefaultPipeline')
     rootNode.addObject('BruteForceBroadPhase')
     rootNode.addObject('BVHNarrowPhase')
-    rootNode.addObject('DefaultContactManager', response='FrictionContactConstraint', responseParams='mu=0.6')
+    rootNode.addObject('DefaultContactManager', response='FrictionContactConstraint', responseParams='mu=0.02')
     rootNode.addObject('LocalMinDistance', name='Proximity', alarmDistance=5, contactDistance=1, angleCone=0.0)
 
     rootNode.addObject('BackgroundSetting', color=[0, 0.168627, 0.211765, 1.])
@@ -67,9 +70,11 @@ def createScene(rootNode):
 
     actuator.addObject('MechanicalObject', name='tetras', template='Vec3', 
                     showIndices=False, showIndicesScale=4e-5)
-    actuator.addObject('UniformMass', totalMass=0.04)
+    actuator.addObject('UniformMass', totalMass=0.09216)
     actuator.addObject('TriangleFEMForceField', template='Vec3', name='FEM', method='large', poissonRatio=0.3,
                         youngModulus=youngModulusActuators)
+    actuator.addObject('SurfacePressureForceField', template='Vec3', name='grf',
+                        rayleighStiffness=0.1, pressure=0.005)
     # actuator.addObject('TetrahedronFEMForceField', template='Vec3', name='FEM', method='large', poissonRatio=0.3,
     #                     youngModulus=youngModulusActuators)
 
@@ -80,7 +85,7 @@ def createScene(rootNode):
     #                    drawBoxes=True)
     # actuator.addObject('RestShapeSpringsForceField', points=0, stiffness=1e12,
     #                     angularStiffness=1e12)
-    actuator.addObject('LinearSolverConstraintCorrection')
+    actuator.addObject('GenericConstraintCorrection')
 
     ##########################################
     # Sub topology						   #
@@ -134,7 +139,7 @@ def createScene(rootNode):
     cavity4.addObject('BarycentricMapping', name='mapping', mapForces=False, mapMasses=False)
 
     ##########################################
-    # Collision							  #
+    # Collision
     ##########################################
 
     collisionActuator = actuator.addChild('collisionActuator')
@@ -163,7 +168,9 @@ def createScene(rootNode):
 
     planeNode = rootNode.addChild('Plane')
     planeNode.addObject('MeshOBJLoader', name='loader', filename='data/mesh/pipe.obj', triangulate=True,
-                        rotation=[0, 90, 0], scale=10, translation=[35, -190, 0])
+                        rotation=[0, 90, 0], scale=10, translation=[25, -170, 0])
+    # planeNode.addObject('MeshOBJLoader', name='loader', filename='data/mesh/floorFlat.obj', triangulate=True,
+    #                     rotation=[0, 0, 270], scale=10, translation=[-15, 0, 0])
     planeNode.addObject('MeshTopology', src='@loader')
     planeNode.addObject('MechanicalObject', src='@loader')
     planeNode.addObject('TriangleCollisionModel', simulated=False, moving=False)
