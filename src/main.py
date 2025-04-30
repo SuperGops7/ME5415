@@ -1,4 +1,6 @@
 import math
+import Sofa.Core
+from Sofa.constants import *
 
 youngModulusActuators = 431
 youngModulusStiffLayerActuators = 1431
@@ -202,10 +204,6 @@ def createScene(rootNode):
 '''
 ===
 '''
-
-import Sofa.Core
-from Sofa.constants import *
-import math
 
 class RobotController(Sofa.Core.Controller):
 
