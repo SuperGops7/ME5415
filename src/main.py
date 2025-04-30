@@ -1,7 +1,7 @@
 import math
 
-youngModulusActuators = 500
-youngModulusStiffLayerActuators = 1500
+youngModulusActuators = 431
+youngModulusStiffLayerActuators = 1431
 
 ROBOT_POS = [-10, 0, 0]
 ROBOT_ORT = [0, 0, -90]
@@ -167,7 +167,7 @@ def createScene(rootNode):
     planeNode.addObject('TriangleCollisionModel', simulated=False, moving=False)
     planeNode.addObject('LineCollisionModel', simulated=False, moving=False)
     planeNode.addObject('PointCollisionModel', simulated=False, moving=False)
-    planeNode.addObject('OglModel', name='Visual', src='@loader', color=[1, 0, 0, 1])
+    planeNode.addObject('OglModel', name='Visual', src='@loader', color=[47/255, 79/255, 79/255, 1])
 
     # ## Cube to check collisions/gravity
     # cube = rootNode.addChild('cube')
