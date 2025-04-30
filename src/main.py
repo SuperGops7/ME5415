@@ -84,8 +84,8 @@ def createScene(rootNode):
     # Sub topology						   #
     ##########################################
     modelSubTopo = actuator.addChild('modelSubTopo')
-    modelSubTopo.addObject('TriangleSetTopologyContainer', position='@../boxROISubTopo.pointsInROI',
-                            triangles='@../boxROISubTopo.trianglesInROI', name='containerSub')
+    modelSubTopo.addObject('TriangleSetTopologyContainer', position='@loader.position',
+                            triangles='@boxROISubTopo.trianglesInROI', name='containerSub')
     modelSubTopo.addObject('TriangleFEMForceField', template='Vec3d', name='FEM', method='large',
                             poissonRatio=0.4, youngModulus=youngModulusStiffLayerActuators - youngModulusActuators)
     # modelSubTopo.addObject('TetrahedronSetTopologyContainer', position='@loader.position',
@@ -101,7 +101,7 @@ def createScene(rootNode):
                         translation=ROBOT_POS, rotation=ROBOT_ORT)
     cavity1.addObject('MeshTopology', src='@loader', name='topo')
     cavity1.addObject('MechanicalObject', name='cavity1')
-    cavity1.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=0.0001,
+    cavity1.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=0,
                         triangles='@topo.triangles', valueType='pressure')
     cavity1.addObject('BarycentricMapping', name='mapping', mapForces=False, mapMasses=False)
 
@@ -110,7 +110,7 @@ def createScene(rootNode):
                         translation=ROBOT_POS, rotation=ROBOT_ORT)
     cavity2.addObject('MeshTopology', src='@loader', name='topo')
     cavity2.addObject('MechanicalObject', name='cavity2')
-    cavity2.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=1.05,
+    cavity2.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=0,
                         triangles='@topo.triangles', valueType='pressure')
     cavity2.addObject('BarycentricMapping', name='mapping', mapForces=False, mapMasses=False)
 
@@ -119,7 +119,7 @@ def createScene(rootNode):
                         translation=ROBOT_POS, rotation=ROBOT_ORT)
     cavity3.addObject('MeshTopology', src='@loader', name='topo')
     cavity3.addObject('MechanicalObject', name='cavity3')
-    cavity3.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=1.05,
+    cavity3.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=0,
                         triangles='@topo.triangles', valueType='pressure')
     cavity3.addObject('BarycentricMapping', name='mapping', mapForces=False, mapMasses=False)
     cavity4 = actuator.addChild('cavity4')
@@ -127,7 +127,7 @@ def createScene(rootNode):
                         translation=ROBOT_POS, rotation=ROBOT_ORT)
     cavity4.addObject('MeshTopology', src='@loader', name='topo')
     cavity4.addObject('MechanicalObject', name='cavity4')
-    cavity4.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=0.0001,
+    cavity4.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=0,
                         triangles='@topo.triangles', valueType='pressure')
     cavity4.addObject('BarycentricMapping', name='mapping', mapForces=False, mapMasses=False)
 
@@ -215,35 +215,58 @@ class RobotController(Sofa.Core.Controller):
         self.constraints = []
         self.dofs = []
         self.dofs.append(self.node.getChild('Actuator 1').getMechanicalState())
-        self.constraints.append(self.node.getChild('Actuator 1').cavity1.SurfacePressureConstraint)
         self.constraints.append(self.node.getChild('Actuator 1').cavity2.SurfacePressureConstraint)
+        self.constraints.append(self.node.getChild('Actuator 1').cavity1.SurfacePressureConstraint)
         self.constraints.append(self.node.getChild('Actuator 1').cavity3.SurfacePressureConstraint)
         self.constraints.append(self.node.getChild('Actuator 1').cavity4.SurfacePressureConstraint)
 
-        self.increasing = True
+        self.state = "increase_1_3"
 
         return
 
     def onAnimateBeginEvent(self, event):
         # print("onAnimateBeginEvent")
 
-        increment = 0.05
-        pressureHighThreshold = 1.05
-        pressureLowThreshold = 0.1
+        increment = 0.1
+        pressureHighThreshold = 3.05
+        pressureLowThreshold = 0.0
+        MIN_PRESSURE = 0
+        MAX_PRESSURE = pressureHighThreshold*1.1
 
-        for i in range(len(self.constraints)):
-            if self.increasing or self.constraints[i].value.value[0] < pressureHighThreshold:
+        # Define the finite states
+        STATE_PHASE_0 = "increase_1_3"
+        STATE_PHASE_1 = "decrease_1_3"
+        STATE_PHASE_2 = "increase_2_4"
+        STATE_PHASE_3 = "decrease_2_4"
+
+        if self.state == STATE_PHASE_0:
+            # Phase 0: pressurize channels 1 & 3
+            for i in [0, 2]:
                 pressureValue = self.constraints[i].value.value[0] + increment
-                if pressureValue > 1.5: # max pressure edge case
-                    pressureValue = 1.5
+                if pressureValue > MAX_PRESSURE: # max pressure edge case
+                    pressureValue = MAX_PRESSURE
                 self.constraints[i].value = [pressureValue]
-                self.increasing = False
-            else:
-                if not self.increasing:
-                    while self.constraints[i].value.value[0] > pressureLowThreshold:
-                        pressureValue = self.constraints[i].value.value[0] - increment
-                        if pressureValue < 0: # min pressure edge case
-                            pressureValue = 0
-                        self.constraints[i].value = [pressureValue]
+            if self.constraints[0].value.value[0] >= pressureHighThreshold and self.constraints[2].value.value[0] >= pressureHighThreshold:
+                self.state = STATE_PHASE_1
+        elif self.state == STATE_PHASE_1:
+            # Phase 1: Depressurize channels 1 & 3
+            self.constraints[0].value = self.constraints[2].value = [0.0]
+            self.state = STATE_PHASE_2
+        
+        elif self.state == STATE_PHASE_2:
+            # Phase 2: pressurize channels 2 & 4
+            for i in [1, 3]:
+                pressureValue = self.constraints[i].value.value[0] + increment
+                if pressureValue > MAX_PRESSURE: # max pressure edge case
+                    pressureValue = MAX_PRESSURE
+                self.constraints[i].value = [pressureValue]
+            if self.constraints[1].value.value[0] >= pressureHighThreshold and self.constraints[3].value.value[0] >= pressureHighThreshold:
+                self.state = STATE_PHASE_3
 
-            # print(self.constraints[i].value.value[0])
+        elif self.state == STATE_PHASE_3:
+            # Phase 3: depressurize channels 2 & 4
+            self.constraints[1].value = self.constraints[3].value = [0.0]
+            self.state = STATE_PHASE_0
+
+        # print(self.constraints[0].value.value[0])
+        # print(self.state)
