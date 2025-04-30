@@ -1,6 +1,8 @@
 # ME5415 AY2024/2025 Project 
 
 # Pipe Robot Locomotion
+Current compatible OS: Ubuntu 22.04 Jammy
+
 After initial environment setup steps, in this ```/proj``` directory
 
         git clone https://github.com/csesarah/ME5415.git
