@@ -228,7 +228,7 @@ class RobotController(Sofa.Core.Controller):
         # print("onAnimateBeginEvent")
 
         increment = 0.1
-        pressureHighThreshold = 3.05
+        pressureHighThreshold = 3.8
         pressureLowThreshold = 0.0
         MIN_PRESSURE = 0
         MAX_PRESSURE = pressureHighThreshold*1.1
