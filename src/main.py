@@ -169,31 +169,32 @@ def createScene(rootNode):
     planeNode.addObject('PointCollisionModel', simulated=False, moving=False)
     planeNode.addObject('OglModel', name='Visual', src='@loader', color=[1, 0, 0, 1])
 
-    ## Cube to check collisions/gravity
-    cube = rootNode.addChild('cube')
-    cube.addObject('EulerImplicitSolver', name='odesolver')
-    cube.addObject('SparseLDLSolver', name='linearSolver', template="CompressedRowSparseMatrixMat3x3d")
-    cube.addObject('MechanicalObject', template='Rigid3', position=[20, 70, 70, 0, 0, 0, 1])
-    cube.addObject('UniformMass', totalMass=0.001)
-    cube.addObject('UncoupledConstraintCorrection')
+    # ## Cube to check collisions/gravity
+    # cube = rootNode.addChild('cube')
+    # cube.addObject('EulerImplicitSolver', name='odesolver')
+    # cube.addObject('SparseLDLSolver', name='linearSolver', template="CompressedRowSparseMatrixMat3x3d")
+    # cube.addObject('MechanicalObject', template='Rigid3', position=[20, 70, 70, 0, 0, 0, 1])
+    # cube.addObject('UniformMass', totalMass=0.001)
+    # cube.addObject('UncoupledConstraintCorrection')
 
-    # collision
-    cubeCollis = cube.addChild('cubeCollis')
-    cubeCollis.addObject('MeshOBJLoader', name='loader', filename='data/mesh/smCube27.obj', triangulate=True,
-                         scale=6)
-    cubeCollis.addObject('MeshTopology', src='@loader')
-    cubeCollis.addObject('MechanicalObject')
-    cubeCollis.addObject('TriangleCollisionModel')
-    cubeCollis.addObject('LineCollisionModel')
-    cubeCollis.addObject('PointCollisionModel')
-    cubeCollis.addObject('RigidMapping')
+    # # collision
+    # cubeCollis = cube.addChild('cubeCollis')
+    # cubeCollis.addObject('MeshOBJLoader', name='loader', filename='data/mesh/smCube27.obj', triangulate=True,
+    #                      scale=6)
+    # cubeCollis.addObject('MeshTopology', src='@loader')
+    # cubeCollis.addObject('MechanicalObject')
+    # cubeCollis.addObject('TriangleCollisionModel')
+    # cubeCollis.addObject('LineCollisionModel')
+    # cubeCollis.addObject('PointCollisionModel')
+    # cubeCollis.addObject('RigidMapping')
 
-    # visualization
-    cubeVisu = cube.addChild('cubeVisu')
-    cubeVisu.addObject('MeshOBJLoader', name='loader', filename='data/mesh/smCube27.obj')
-    cubeVisu.addObject('OglModel', name='Visual', src='@loader', color=[0.0, 0.1, 0.5], scale=6.2)
-    cubeVisu.addObject('RigidMapping')
+    # # visualization
+    # cubeVisu = cube.addChild('cubeVisu')
+    # cubeVisu.addObject('MeshOBJLoader', name='loader', filename='data/mesh/smCube27.obj')
+    # cubeVisu.addObject('OglModel', name='Visual', src='@loader', color=[0.0, 0.1, 0.5], scale=6.2)
+    # cubeVisu.addObject('RigidMapping')
     
+    ## Control
     rootNode.addObject(RobotController(node=rootNode))
 
     return rootNode
