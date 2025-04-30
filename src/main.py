@@ -162,14 +162,14 @@ def createScene(rootNode):
     ##########################################
 
     planeNode = rootNode.addChild('Plane')
-    planeNode.addObject('MeshOBJLoader', name='loader', filename='data/mesh/floorFlat.obj', triangulate=True,
-                        rotation=[0, 0, 270], scale=10, translation=[-15, 0, 0])
+    planeNode.addObject('MeshOBJLoader', name='loader', filename='data/mesh/pipe.obj', triangulate=True,
+                        rotation=[0, 90, 0], scale=10, translation=[35, -190, 0])
     planeNode.addObject('MeshTopology', src='@loader')
     planeNode.addObject('MechanicalObject', src='@loader')
     planeNode.addObject('TriangleCollisionModel', simulated=False, moving=False)
     planeNode.addObject('LineCollisionModel', simulated=False, moving=False)
     planeNode.addObject('PointCollisionModel', simulated=False, moving=False)
-    planeNode.addObject('OglModel', name='Visual', src='@loader', color=[47/255, 79/255, 79/255, 1])
+    planeNode.addObject('OglModel', name='Visual', src='@loader', color=[224/255, 255/255, 255/255, 0.2])
 
     # ## Cube to check collisions/gravity
     # cube = rootNode.addChild('cube')
