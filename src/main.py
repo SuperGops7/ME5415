@@ -110,7 +110,7 @@ def createScene(rootNode):
                         translation=ROBOT_POS, rotation=ROBOT_ORT)
     cavity2.addObject('MeshTopology', src='@loader', name='topo')
     cavity2.addObject('MechanicalObject', name='cavity2')
-    cavity2.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=0.0001,
+    cavity2.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=1.05,
                         triangles='@topo.triangles', valueType='pressure')
     cavity2.addObject('BarycentricMapping', name='mapping', mapForces=False, mapMasses=False)
 
@@ -119,7 +119,7 @@ def createScene(rootNode):
                         translation=ROBOT_POS, rotation=ROBOT_ORT)
     cavity3.addObject('MeshTopology', src='@loader', name='topo')
     cavity3.addObject('MechanicalObject', name='cavity3')
-    cavity3.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=0.0001,
+    cavity3.addObject('SurfacePressureConstraint', name='SurfacePressureConstraint', template='Vec3', value=1.05,
                         triangles='@topo.triangles', valueType='pressure')
     cavity3.addObject('BarycentricMapping', name='mapping', mapForces=False, mapMasses=False)
     cavity4 = actuator.addChild('cavity4')
@@ -228,8 +228,8 @@ class RobotController(Sofa.Core.Controller):
         # print("onAnimateBeginEvent")
 
         increment = 0.05
-        pressureHighThreshold = 1.2
-        pressureLowThreshold = 0.2
+        pressureHighThreshold = 1.05
+        pressureLowThreshold = 0.1
 
         for i in range(len(self.constraints)):
             if self.increasing or self.constraints[i].value.value[0] < pressureHighThreshold:
